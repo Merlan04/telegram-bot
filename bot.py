@@ -1,6 +1,7 @@
 import asyncio
 import os
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 from telethon.tl.types import User
 from dotenv import load_dotenv
 
@@ -13,10 +14,28 @@ phone_number = os.getenv('PHONE_NUMBER')
 admin_id = int(os.getenv('ADMIN_ID'))
 keywords = [k.strip().lower() for k in os.getenv('KEYWORDS').split(',')]
 
-# Создаём клиент
-client = TelegramClient('session', api_id, api_hash)
+# Создаём клиент с сохранением сессии
+session_string = os.getenv('SESSION_STRING', '')
+client = TelegramClient(StringSession(session_string), api_id, api_hash)
 
 notified_messages = set()
+
+
+def save_session_to_env(session_str):
+    """Сохраняет сессию в .env файл"""
+    env_path = '.env'
+    with open(env_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    if 'SESSION_STRING=' in content:
+        content = content.split('SESSION_STRING=')[0] + f'SESSION_STRING={session_str}\n'
+    else:
+        content += f'\nSESSION_STRING={session_str}'
+
+    with open(env_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+    print('✅ SESSION_STRING сохранена в .env')
 
 
 @client.on(events.NewMessage())
@@ -92,6 +111,11 @@ async def main():
     try:
         await client.start(phone=phone_number)
         print('✅ Успешно подключено к Telegram!\n')
+
+        # Сохраняем сессию
+        session_str = client.session.save()
+        save_session_to_env(session_str)
+
         print('🚀 Бот запущен и слушает сообщения...')
         print('⏹️  Для остановки нажми Ctrl+C\n')
 
