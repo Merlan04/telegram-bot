@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import asyncio
 import os
 from telethon import TelegramClient, events
@@ -111,7 +110,7 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-=======
+
 import asyncio
 import os
 from telethon import TelegramClient, events
@@ -241,4 +240,4 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
->>>>>>> 3507133e0f4ac3d53b2df7eb02164a4add6f9c1b
+
